@@ -1,7 +1,11 @@
 const router = require('express').Router();
 
 router.get('/', async (req, res, next) => {
-  res.send({ message: 'Ok api is working 🚀' });
+  try {
+    
+  } catch (error) {
+    
+  }
 });
 
 module.exports = router;
