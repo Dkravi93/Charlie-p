@@ -11,7 +11,6 @@ router.get('/products', async (req, res, next) => {
 
     let data = await Products.find();
       let sortBy = req.query || null;  
-      let filters = req.query || null;
       let page = req.query.page || 1;
       let size = req.query.size || 4;
       let products = await Products.find();
@@ -31,24 +30,25 @@ router.get('/products', async (req, res, next) => {
         products = await Products.aggregate([{ $sort : {title : 1}}])
       }else if( sortBy.title === 'desc'){
         products = await Products.aggregate([{ $sort : {title : -1}}])
-      }else{
-        products =  products.filter(user => {
-          return user.title = sortBy.title
-          
-        });
+      }else {
+        products =  products.filter(user => user.title === sortBy.title);
+      
+
       }
     }else if (sortBy.category){
  
-          products =  products.filter(user => {
-            return user.category = sortBy.category
-      
-        });
+          products =  products.filter(user => user.category === sortBy.category);
     }
-  
-    var newProd = products.slice(parseInt(page),parseInt(page)+parseInt(size)+1);
+
+    var newProd = products.slice(parseInt(page),parseInt(page)+parseInt(size));
+    console.log(newProd)
+
     if(Math.ceil(data.length/newProd.length)<page){
       res.status(404).json({status : 'Failed',message:"page doesn't exist"})
+    }else if(products.length == 1){
+      newProd = products.slice(parseInt(page)-1,parseInt(page)+parseInt(size))
     }
+
     res.status(200).json({
       status : 'success',
       count : newProd.length,
