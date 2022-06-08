@@ -1,32 +1,24 @@
 const router = require('express').Router();
 
+const { parse } = require('dotenv');
 const { Products } = require('../models/products')
 
 // for all products
 
-router.get('/', async (req, res, next) => {
+router.get('/products', async (req, res, next) => {
   try {
-      let sortBy = req.query || null;
+   
+
+    let data = await Products.find();
+      let sortBy = req.query || null;  
       let filters = req.query || null;
       let page = req.query.page || 1;
       let size = req.query.size || 4;
-      let products = "";
-      console.log(sortBy);  
+      let products = await Products.find();
       // pagination
-    if((req.query.page || req.query.size) ){
-      products = await Products.find()
-          .skip((page-1)*size)
-          .limit(size)
-
-          res.status(200).json({
-            status : 'success',
-            count : products.length,
-            data : {products}
-          });
-          return
-    }  
+      // 
     // sorting
-
+  
     if(sortBy.price){
       if(sortBy.price === 'asc'){
         products = await Products.aggregate([{ $sort : {price : 1}}])
@@ -40,53 +32,32 @@ router.get('/', async (req, res, next) => {
       }else if( sortBy.title === 'desc'){
         products = await Products.aggregate([{ $sort : {title : -1}}])
       }else{
-        products = await Products.find()
         products =  products.filter(user => {
-          let isValid = true;
-          for (key in filters) {
-            console.log(key, user[key], filters[key]);
-            isValid = isValid && user[key] == filters[key];
-          }
-          return isValid;
-     
-    });
+          return user.title = sortBy.title
+          
+        });
       }
     }else if (sortBy.category){
-        products = await Products.find()
+ 
           products =  products.filter(user => {
-            let isValid = true;
-            for (key in filters) {
-              console.log(key, user[key], filters[key]);
-              isValid = isValid && user[key] == filters[key];
-            }
-            return isValid;
+            return user.category = sortBy.category
       
-      });
+        });
     }
-
-    
+  
+    var newProd = products.slice(parseInt(page),parseInt(page)+parseInt(size)+1);
+    if(Math.ceil(data.length/newProd.length)<page){
+      res.status(404).json({status : 'Failed',message:"page doesn't exist"})
+    }
     res.status(200).json({
       status : 'success',
-      count : products.length,
-      data : {products}
+      count : newProd.length,
+      totalPage :  Math.ceil(data.length/newProd.length),
+      data : newProd
+     
     });
-   // filter by tile category
 
-//    if(filters){
-//     // console.log(filters)if(filter.range)
-//     products = await Products.find()
-//     products =  products.filter(user => {
-//         let isValid = true;
-//         for (key in filters) {
-//           console.log(key, user[key], filters[key]);
-//           isValid = isValid && user[key] == filters[key];
-//         }
-//         return isValid;
-   
-//   });
-// }
-    
-    // res.send(filteredUsers);
+
     
   } catch (error) {
     res.status(404).json({
@@ -97,7 +68,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // for single products
-router.get('/: id', async (req, res, next) => {
+router.get('/products/: id', async (req, res, next) => {
   try {
     const products = await Products.findById(req.params.id)
     res.status(200).json({
@@ -115,7 +86,7 @@ router.get('/: id', async (req, res, next) => {
 
 // create single products
 
-router.post('/' , async (req, res, next)=> {
+router.post('/products' , async (req, res, next)=> {
    try {
     const products = await Products.create(req.body);
     res.status(200).json({
@@ -133,7 +104,7 @@ router.post('/' , async (req, res, next)=> {
 
 // update the single product
 
-router.patch('/:id' , async (req, res)=> {
+router.patch('/products/:id' , async (req, res)=> {
    try {
     const products = await Products.findByIdAndUpdate(req.params.id, req.body , {
       new : true,
@@ -153,7 +124,7 @@ router.patch('/:id' , async (req, res)=> {
 
 // find and delete product
 
-router.delete('/:id' , async (req, res, next)=> {
+router.delete('/products/:id' , async (req, res, next)=> {
    try {
       await Products.findByIdAndDelete( req.params.id );
     res.status(200).json({
