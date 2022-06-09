@@ -24,6 +24,7 @@ app.use((err, req, res, next) => {
     status: err.status || 500,
     message: err.message,
   });
+  res.render('errorPage')
 });
 
 const PORT = process.env.PORT || 3000;

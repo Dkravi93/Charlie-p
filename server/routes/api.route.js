@@ -15,7 +15,7 @@ router.get('/products', async (req, res, next) => {
       let size = req.query.size || 4;
       let products = await Products.find();
       // pagination
-      // 
+      
     // sorting
   
     if(sortBy.price){
@@ -32,27 +32,25 @@ router.get('/products', async (req, res, next) => {
         products = await Products.aggregate([{ $sort : {title : -1}}])
       }else {
         products =  products.filter(user => user.title === sortBy.title);
-      
-
       }
+
     }else if (sortBy.category){
- 
           products =  products.filter(user => user.category === sortBy.category);
     }
+    
 
-    var newProd = products.slice(parseInt(page),parseInt(page)+parseInt(size));
-    console.log(newProd)
-
-    if(Math.ceil(data.length/newProd.length)<page){
+    var totalPage = Math.ceil(products.length/size);
+    var newProd = products.slice(parseInt(page)*parseInt(size)-1,parseInt(page)*parseInt(size)+parseInt(size)-1);
+   
+    // console.log(newProd)
+    if( totalPage < page ){
       res.status(404).json({status : 'Failed',message:"page doesn't exist"})
-    }else if(products.length == 1){
-      newProd = products.slice(parseInt(page)-1,parseInt(page)+parseInt(size))
     }
 
     res.status(200).json({
       status : 'success',
       count : newProd.length,
-      totalPage :  Math.ceil(data.length/newProd.length),
+      totalPage :  totalPage,
       data : newProd
      
     });
