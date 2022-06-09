@@ -7,7 +7,7 @@ const Display = () => {
     let [display,setDisplay] = useState([]);
     let [tpage,setTpage] = useState([1])
     let [page,setPage] = useState(1)
-    let [size,setSize] = useState(6)
+    let [size,setSize] = useState(4)
     useEffect(()=>{
         // console.log(type,action,page)
          getData();
@@ -59,6 +59,9 @@ const Display = () => {
                             <li onClick={(e) =>setList({type:"category",action:"electronics"})}><a className="dropdown-item" href="#">Electronics</a></li>
                             <li onClick={(e) =>setList({type:"category",action:"jewelery"})}><a className="dropdown-item" href="#">Jewelery</a></li>
                         </ul>
+                        <button onClick={() =>{setList({type:"",action:""});setDisplay([]); getData();}}>
+                            Reset
+                        </button>
                     </div>
                 </div>
                 <div  style={{ display: 'grid', gridTemplateColumns: 'auto auto auto',  backgroundColor: '#2196F3',
