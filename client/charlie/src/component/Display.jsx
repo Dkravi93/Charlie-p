@@ -17,7 +17,7 @@ const Display = () => {
         let {type,action} = list;
         setDisplay([]);
         console.log(page,display)
-        axios.get(`http://localhost:3001/api/products/?${type}=${action}&page=${page}&size=${size}`)
+        axios.get(`https://charlie-p.herokuapp.com/api/products/?${type}=${action}&page=${page}&size=${size}`)
         .then((res)=>{
             let {data,totalPage,} = res.data;
             console.log(res)
