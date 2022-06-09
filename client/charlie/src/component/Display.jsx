@@ -4,25 +4,30 @@ import "./Display.css";
 
 const Display = () => {
     let [list,setList] = useState({type:"",action:""})
-    let {type,action} = list;
     let [display,setDisplay] = useState([]);
-    let [tpage,setTpage] = useState(1)
+    let [tpage,setTpage] = useState([1])
     let [page,setPage] = useState(1)
     let [size,setSize] = useState(6)
+    useEffect(()=>{
+        // console.log(type,action,page)
+         getData();
+    },[list,page])
     const getData = () =>
     {
+        let {type,action} = list;
+        setDisplay([]);
+        console.log(page,display)
         axios.get(`http://localhost:3001/api/products/?${type}=${action}&page=${page}&size=${size}`)
         .then((res)=>{
-            let {data,totalPage} = res.data;
+            let {data,totalPage,} = res.data;
             console.log(res)
-            setPage(totalPage)
+            var arr = new Array(totalPage).fill().map((_, i) => i+1);
+            
+            setTpage(arr)
+            
             setDisplay(data);
         })
     }
-    useEffect(()=>{
-        console.log(type,action,page)
-         getData();
-    },[list])
   return (
             <div>
                 <div style={{display : 'flex',margin: '10px 30%',justifyContent: 'space-between'}}>
@@ -77,14 +82,15 @@ const Display = () => {
                     
                 </div>
                 <div className="pagination">
-                        <a href="#">&laquo;</a>
-                        <a href="#">1</a>
-                        <a class="active" href="#">2</a>
-                        <a href="#">3</a>
-                        <a href="#">4</a>
-                        <a href="#">5</a>
-                        <a href="#">6</a>
-                        <a href="#">&raquo;</a>
+                <a href="#">&laquo;</a>
+                    {tpage.map((el)=>{
+                        return (
+                            <div key={el}>
+                                <a className={page === el ? 'active' : 'inactive'} href="#" onClick={() => setPage(el)}>{el}</a>
+                            </div>
+                        )
+                    })}
+                <a href="#">&raquo;</a>
                     </div>
             </div>
   )
